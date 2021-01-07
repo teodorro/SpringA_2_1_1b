@@ -1,6 +1,7 @@
 package servlet;
 
 import controller.PostController;
+import exception.NotFoundException;
 import repository.PostRepository;
 import service.PostService;
 
@@ -9,6 +10,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
+import static servlet.RequestType.*;
 
 public class MainServlet extends HttpServlet {
     private PostController controller;
@@ -26,35 +29,94 @@ public class MainServlet extends HttpServlet {
             final var path = req.getRequestURI();
             final var method = req.getMethod();
 
-            if (path.equals("/")) {
-//                resp.getOutputStream().print("hello!");
-                controller.all(resp);
-                return;
+            switch (getRequestType(method, path)){
+                case GET_ALL:
+                    getAll(resp);
+                    return;
+                case GET_BY_ID:
+                    getById(resp, path);
+                    return;
+                case ADD:
+                    add(resp, req);
+                    return;
+                case DELETE:
+                    delete(resp, path);
+                    return;
+                default:
+                    resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                    return;
             }
-
-            if (method.equals("GET") && path.equals("/api/posts")){
-                controller.all(resp);
-                return;
-            }
-            if (method.equals("GET") && path.matches("/api/posts/\\d+")){
-                final var id = Long.parseLong(path.substring(path.lastIndexOf("/")));
-                controller.getById(id, resp);
-                return;
-            }
-            if (method.equals("POST") && path.equals("/api/posts")){
-                controller.save(req.getReader(), resp);
-                return;
-            }
-            if (method.equals("DELETE") && path.matches("/api/posts/\\d+")){
-                final var id = Long.parseLong(path.substring(path.lastIndexOf("/")));
-                controller.removeById(id, resp);
-                return;
-            }
-            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             e.printStackTrace();
             resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
-
     }
+
+    private void delete(HttpServletResponse resp, String path) throws IOException {
+        final var id = Long.parseLong(path.substring(path.lastIndexOf("/") + 1));
+        controller.removeById(id, resp);
+    }
+
+    private void add(HttpServletResponse resp, HttpServletRequest req) throws IOException, NotFoundException {
+        controller.save(req.getReader(), resp);
+    }
+
+    private void getById(HttpServletResponse resp, String path) throws IOException, NotFoundException {
+        final var id = Long.parseLong(path.substring(path.lastIndexOf("/") + 1));
+        controller.getById(id, resp);
+    }
+
+    private void getAll(HttpServletResponse resp) throws IOException {
+        controller.all(resp);
+    }
+
+    private RequestType getRequestType(String method, String path){
+        if (method.equals("GET") && path.equals("/api/posts"))
+            return GET_ALL;
+        if (method.equals("GET") && path.matches("/api/posts/\\d+"))
+            return GET_BY_ID;
+        if (method.equals("POST") && path.equals("/api/posts"))
+            return ADD;
+        if (method.equals("DELETE") && path.matches("/api/posts/\\d+"))
+            return DELETE;
+        return UNKNOWN;
+    }
+
+
+//    @Override
+//    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+//        try {
+//            final var path = req.getRequestURI();
+//            final var method = req.getMethod();
+//
+//            if (path.equals("/")) {
+//                controller.all(resp);
+//                return;
+//            }
+//
+//            if (method.equals("GET") && path.equals("/api/posts")){
+//                controller.all(resp);
+//                return;
+//            }
+//            if (method.equals("GET") && path.matches("/api/posts/\\d+")){
+//                final var id = Long.parseLong(path.substring(path.lastIndexOf("/")));
+//                controller.getById(id, resp);
+//                return;
+//            }
+//            if (method.equals("POST") && path.equals("/api/posts")){
+//                controller.save(req.getReader(), resp);
+//                return;
+//            }
+//            if (method.equals("DELETE") && path.matches("/api/posts/\\d+")){
+//                final var id = Long.parseLong(path.substring(path.lastIndexOf("/")));
+//                controller.removeById(id, resp);
+//                return;
+//            }
+//            resp.setStatus(HttpServletResponse.SC_NOT_FOUND);
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//            resp.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+//        }
+//    }
 }

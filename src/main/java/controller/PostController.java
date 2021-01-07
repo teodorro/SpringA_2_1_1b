@@ -1,6 +1,7 @@
 package controller;
 
 import com.google.gson.Gson;
+import exception.NotFoundException;
 import model.Post;
 import service.PostService;
 
@@ -17,25 +18,31 @@ public class PostController {
     }
 
     public void all(HttpServletResponse response) throws IOException {
-        response.setContentType(APPLICATION_JSON);
-        final var data = service.all();
         final var gson = new Gson();
-        response.getWriter().print(gson.toJson(data));
+        final var data = service.all();
+        printResponseData(response, gson.toJson(data));
     }
 
-    public void getById(long id, HttpServletResponse response){
-
+    public void getById(long id, HttpServletResponse response) throws IOException, NotFoundException {
+        final var gson = new Gson();
+        final var data = service.getById(id);
+        printResponseData(response, gson.toJson(data));
     }
 
-    public void save(Reader body, HttpServletResponse response) throws IOException {
-        response.setContentType(APPLICATION_JSON);
+    public void save(Reader body, HttpServletResponse response) throws IOException, NotFoundException {
         final var gson = new Gson();
         final var post = gson.fromJson(body, Post.class);
         final var data = service.save(post);
-        response.getWriter().print(gson.toJson(data));
+        printResponseData(response, gson.toJson(data));
     }
 
-    public void removeById(long id, HttpServletResponse response){
+    private void printResponseData(HttpServletResponse response, String s) throws IOException {
+        response.setContentType(APPLICATION_JSON);
+        response.getWriter().print(s);
+    }
 
+    public void removeById(long id, HttpServletResponse response) throws IOException {
+        service.removeById(id);
+        printResponseData(response, "Post with id=" + id + " was deleted");
     }
 }
