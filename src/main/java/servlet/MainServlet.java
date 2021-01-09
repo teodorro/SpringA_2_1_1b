@@ -1,9 +1,11 @@
 package servlet;
 
 import com.google.gson.Gson;
+import config.Config;
 import controller.PostController;
 import exception.NotFoundException;
 import model.Post;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import repository.PostRepository;
 import service.PostService;
 
@@ -21,14 +23,13 @@ public class MainServlet extends HttpServlet {
     private PostController controller;
 
     @Override
-    public void init() throws ServletException {
-        final var repository = new PostRepository();
-        final var service = new PostService(repository);
-        controller = new PostController(service);
+    public void init() {
+        var context = new AnnotationConfigApplicationContext(Config.class);
+        controller = context.getBean(PostController.class);
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) {
         try {
             final var path = req.getRequestURI();
             final var method = req.getMethod();
