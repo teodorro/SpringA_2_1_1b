@@ -5,7 +5,7 @@
          version="4.0">
     <servlet>
         <servlet-name>main</servlet-name>
-        <servlet-class>servlet.MainServlet</servlet-class>
+        <servlet-class>springPack.servlet.MainServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
 

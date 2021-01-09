@@ -1,4 +1,4 @@
-package model;
+package springPack.model;
 
 public class Post {
     private long id;

@@ -1,4 +1,4 @@
-package servlet;
+package springPack.servlet;
 
 public enum RequestType {
     GET_ALL,

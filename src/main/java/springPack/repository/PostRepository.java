@@ -1,7 +1,8 @@
-package repository;
+package springPack.repository;
 
-import exception.NotFoundException;
-import model.Post;
+import org.springframework.stereotype.Repository;
+import springPack.exception.NotFoundException;
+import springPack.model.Post;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -10,6 +11,7 @@ import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+@Repository
 public class PostRepository {
     private long nextId = 5;
     private List<Post> repository = new ArrayList<>();

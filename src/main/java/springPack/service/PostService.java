@@ -1,14 +1,18 @@
-package service;
+package springPack.service;
 
-import exception.NotFoundException;
-import model.Post;
-import repository.PostRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import springPack.exception.NotFoundException;
+import springPack.model.Post;
+import org.springframework.stereotype.Service;
+import springPack.repository.PostRepository;
 
 import java.util.List;
 
+@Service
 public class PostService {
     private final PostRepository repository;
 
+    @Autowired
     public PostService(PostRepository repository) {
         this.repository = repository;
     }

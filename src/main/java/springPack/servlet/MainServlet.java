@@ -1,34 +1,30 @@
-package servlet;
+package springPack.servlet;
 
-import com.google.gson.Gson;
-import controller.PostController;
-import exception.NotFoundException;
-import model.Post;
-import repository.PostRepository;
-import service.PostService;
+import springPack.controller.PostController;
+import springPack.exception.NotFoundException;
+import org.springframework.context.annotation.AnnotationConfigApplicationContext;
+import springPack.repository.PostRepository;
+import springPack.service.PostService;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
-import static servlet.RequestType.*;
+import static springPack.servlet.RequestType.*;
 
 public class MainServlet extends HttpServlet {
     private PostController controller;
 
     @Override
-    public void init() throws ServletException {
-        final var repository = new PostRepository();
-        final var service = new PostService(repository);
-        controller = new PostController(service);
+    public void init() {
+        final var context = new AnnotationConfigApplicationContext("springPack");
+        controller = context.getBean(PostController.class);
     }
 
     @Override
-    protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void service(HttpServletRequest req, HttpServletResponse resp) {
         try {
             final var path = req.getRequestURI();
             final var method = req.getMethod();
